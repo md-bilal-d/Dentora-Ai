@@ -302,16 +302,25 @@ os.makedirs(RESULTS_DIR, exist_ok=True)
 MODEL_PATH = os.path.join(PROJECT_DIR, "best.pt")
 
 model = None
+model_error = None
+
 if os.path.exists(MODEL_PATH):
-    try:
-        print(f"Loading REAL fine-tuned model from: {MODEL_PATH}")
-        model = YOLO(MODEL_PATH)
-        print("Model loaded successfully!")
-    except Exception as e:
-        print(f"ERROR: Failed to load model at {MODEL_PATH}. Exception: {e}")
-        model = None
+    file_size = os.path.getsize(MODEL_PATH)
+    if file_size < 1000000: # Less than 1MB means it's an LFS pointer, not the file!
+        model_error = f"best.pt is an LFS pointer, not the real file! Size: {file_size} bytes."
+        print(model_error)
+    else:
+        try:
+            print(f"Loading REAL fine-tuned model from: {MODEL_PATH} ({file_size} bytes)")
+            model = YOLO(MODEL_PATH)
+            print("Model loaded successfully!")
+        except Exception as e:
+            model_error = f"Failed to load model. Exception: {e}"
+            print(f"ERROR: {model_error}")
+            model = None
 else:
-    print(f"WARNING: Fine-tuned model not found at {MODEL_PATH}. AI features will gracefully degrade.")
+    model_error = f"best.pt file completely missing from container at {MODEL_PATH}."
+    print("WARNING: " + model_error)
 
 # Disease severity mapping
 SEVERITY_MAP = {
@@ -434,20 +443,22 @@ def assign_tooth_number(bbox, img_width, img_height):
 def scan_xray():
     """Accept an X-ray image, run YOLO inference, return detections."""
     if model is None:
-        print("WARNING: Model not loaded. Returning mock fallback data for UI demonstration.")
-        # Fallback to mock data so the demo still works
+        print("WARNING: Model not loaded. Returning fallback data for UI demonstration.")
+        # Return the actual error in the mock response so we can debug it on the UI!
         import time
         time.sleep(1.5)  # Simulate processing delay
         mock_scan_id = str(uuid.uuid4())[:8]
+        
+        # If there's an error, show it as the ONLY detection
+        fallback_class = f"ERROR: {model_error}" if model_error else "ERROR: Unknown model load failure."
+        
         return jsonify({
             "scan_id": mock_scan_id,
             "detections": [
-                {"class": "Caries", "confidence": 92.5, "severity": "high", "bbox": [100, 100, 50, 50], "tooth_number": 14},
-                {"class": "Bone loss", "confidence": 85.0, "severity": "high", "bbox": [200, 200, 40, 40], "tooth_number": 30},
-                {"class": "Filling", "confidence": 98.1, "severity": "low", "bbox": [300, 150, 30, 30], "tooth_number": 8}
+                {"class": fallback_class, "confidence": 100.0, "severity": "high", "bbox": [50, 50, 400, 100], "tooth_number": 1}
             ],
-            "total_detections": 3,
-            "disease_score": 75.0,
+            "total_detections": 1,
+            "disease_score": 100.0,
             "annotated_image": None,
             "original_image": None
         })
