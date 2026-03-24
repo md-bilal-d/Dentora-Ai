@@ -444,8 +444,10 @@ export const AIScanPanel = () => {
 
                     {/* Analysis Sidebar */}
                     <div className="flex-none lg:flex-[3] rounded-2xl border border-border bg-surface flex flex-col overflow-visible lg:overflow-hidden">
-                        <div className="p-5 border-b border-border bg-[#161B22]/50 flex items-center justify-between">
-                            <h3 className="font-bold flex items-center gap-2"><Brain size={18} className="text-primary"/> Analysis Mode</h3>
+                        <div className="p-4 sm:p-6 border-b border-border bg-[#161B22]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex items-center gap-6 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
+                                <h3 className="font-bold flex items-center gap-2"><Brain size={18} className="text-primary"/> Analysis Mode</h3>
+                            </div>
                             <span className="text-[10px] font-black tracking-widest uppercase text-primary">{scanning ? 'In Progress' : 'Ready'}</span>
                         </div>
                         
@@ -492,23 +494,23 @@ export const AIScanPanel = () => {
                                 </div>
                             ))}
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto mt-2 sm:mt-0 pt-3 sm:pt-0 border-t border-border sm:border-t-0">
                             <div className="flex bg-bg rounded-lg p-1 border border-border">
                                 {(['all', 'issues', 'healthy'] as FilterMode[]).map(f => (
-                                    <button key={f} onClick={() => setFilterMode(f)} className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase ${filterMode === f ? 'bg-primary text-white' : 'text-text-muted'}`}>{f}</button>
+                                    <button key={f} onClick={() => setFilterMode(f)} className={`px-2 sm:px-3 py-1.5 rounded-md text-[9px] sm:text-[10px] font-bold uppercase transition-colors ${filterMode === f ? 'bg-primary text-white' : 'text-text-muted hover:text-text'}`}>{f}</button>
                                 ))}
                             </div>
-                            <div className="flex bg-bg rounded-lg p-1 border border-border">
-                                <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-md ${viewMode === 'grid' ? 'text-primary bg-surface' : 'text-text-muted'}`}><Grid size={16}/></button>
-                                <button onClick={() => setViewMode('list')} className={`p-1.5 rounded-md ${viewMode === 'list' ? 'text-primary bg-surface' : 'text-text-muted'}`}><LayoutList size={16}/></button>
+                            <div className="flex bg-bg rounded-lg p-1 border border-border shrink-0">
+                                <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'text-primary bg-surface' : 'text-text-muted hover:text-text'}`}><Grid size={14}/></button>
+                                <button onClick={() => setViewMode('list')} className={`p-1.5 rounded-md transition-colors ${viewMode === 'list' ? 'text-primary bg-surface' : 'text-text-muted hover:text-text'}`}><LayoutList size={14}/></button>
                             </div>
-                            <button onClick={handleReset} className="p-2 bg-surface text-text-muted border border-border rounded-lg hover:text-text"><RotateCcw size={16}/></button>
+                            <button onClick={handleReset} className="p-2 bg-surface text-text-muted border border-border rounded-lg hover:text-text transition-colors shrink-0"><RotateCcw size={14}/></button>
                         </div>
                     </div>
 
-                    <div className="flex-1 flex min-h-0 overflow-hidden">
+                    <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
                         {/* LEFT: X-RAY IMAGE WITH INFERENCE BOXES */}
-                        <div className="flex-[3] relative bg-[#0D1117] flex items-center justify-center p-4 border-r border-border overflow-hidden">
+                        <div className="flex-[3] relative bg-[#0D1117] flex items-center justify-center p-4 lg:border-r border-border overflow-hidden min-h-[300px] lg:min-h-0">
                             <div className="relative inline-block max-w-full max-h-full">
                                 <img 
                                     ref={imageRef}
@@ -574,9 +576,9 @@ export const AIScanPanel = () => {
                                                     <motion.div 
                                                         initial={{ opacity: 0 }}
                                                         animate={{ opacity: 1, zIndex: isHovered || isSelected ? 31 : 21 }}
-                                                        className="absolute flex items-center whitespace-nowrap text-[9px] font-bold leading-none pointer-events-none"
+                                                        className="absolute flex items-center whitespace-nowrap text-[8px] sm:text-[9px] font-bold leading-none pointer-events-none"
                                                         style={{
-                                                            left: `${x}px`, top: `${labelY}px`, backgroundColor: color, color: (color === '#FFFFFF' || color === '#00FFFF' || color === '#D29922') ? '#000' : '#FFF', padding: '2px 5px', borderRadius: '2px'
+                                                            left: `${x}px`, top: `${labelY}px`, backgroundColor: color, color: (color === '#FFFFFF' || color === '#00FFFF' || color === '#D29922') ? '#000' : '#FFF', padding: '2px 4px', borderRadius: '1px'
                                                         }}
                                                     >
                                                         {det.class} {confDisplay}%
@@ -588,41 +590,45 @@ export const AIScanPanel = () => {
                                 })()}
                             </div>
 
-                            {/* Clinical Pathway Recommendation (Overlay) */}
+                            {/* Clinical Pathway Recommendation (Overlay / Bottom Sheet) */}
                             {selectedDetection && (
-                                <div className="absolute bottom-6 right-6 w-80 space-y-3 z-40">
-                                    <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest">Clinical Pathway: Tooth #{selectedDetection.tooth_number}</p>
+                                <motion.div 
+                                    initial={{ y: 100, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 left-4 sm:left-auto sm:w-80 space-y-2 sm:space-y-3 z-40"
+                                >
+                                    <p className="hidden sm:block text-[10px] text-text-muted font-bold uppercase tracking-widest">Clinical Pathway: Tooth #{selectedDetection.tooth_number}</p>
                                     <div className="space-y-2">
                                         {selectedDetection.class === 'Caries' && (
-                                            <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/10 backdrop-blur-md space-y-2 shadow-2xl">
-                                                <div className="flex items-center gap-2 text-red-400 font-bold text-xs"><Sparkles size={14}/> Recommended Action</div>
-                                                <p className="text-xs text-text-muted leading-relaxed">Schedule minimally invasive restoration. Consider fluoride varnish application on adjacent teeth.</p>
-                                                <button className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-[10px] font-black uppercase rounded-lg transition-colors border border-red-500/30">Book Priority Treatment</button>
+                                            <div className="p-3 sm:p-4 rounded-xl border border-red-500/20 bg-red-500/15 backdrop-blur-xl space-y-1.5 sm:space-y-2 shadow-2xl">
+                                                <div className="flex items-center gap-2 text-red-400 font-bold text-[10px] sm:text-xs"><Sparkles size={14}/> Recommended Action: #{selectedDetection.tooth_number}</div>
+                                                <p className="text-[10px] sm:text-xs text-text-muted leading-relaxed">Schedule minimally invasive restoration. Consider fluoride varnish application.</p>
+                                                <button className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-[9px] sm:text-[10px] font-black uppercase rounded-lg transition-colors border border-red-500/30">Book Priority</button>
                                             </div>
                                         )}
                                         {selectedDetection.class === 'Healthy' && (
-                                            <div className="p-4 rounded-xl border border-green-500/20 bg-green-500/10 backdrop-blur-md space-y-2 shadow-2xl">
-                                                <div className="flex items-center gap-2 text-green-400 font-bold text-xs"><Brain size={14}/> AI Insight</div>
-                                                <p className="text-xs text-text-muted leading-relaxed">No intervention required. Maintain current hygiene protocol and schedule 6-month cleaning.</p>
+                                            <div className="p-3 sm:p-4 rounded-xl border border-green-500/20 bg-green-500/15 backdrop-blur-xl space-y-1.5 sm:space-y-2 shadow-2xl text-[10px] sm:text-xs">
+                                                <div className="flex items-center gap-2 text-green-400 font-bold"><Brain size={14}/> AI Insight: #{selectedDetection.tooth_number}</div>
+                                                <p className="text-text-muted leading-relaxed">No intervention required. Maintain current hygiene protocol.</p>
                                             </div>
                                         )}
                                         {(selectedDetection.class === 'Root Canal Treatment' || selectedDetection.class === 'Crown') && (
-                                            <div className="p-4 rounded-xl border border-cyan-500/20 bg-cyan-500/10 backdrop-blur-md space-y-2 shadow-2xl">
-                                                <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs"><Sparkles size={14}/> Follow-up Care</div>
-                                                <p className="text-xs text-text-muted leading-relaxed">Monitor structural integrity. Ensure proper marginal seal in subsequent checkups.</p>
+                                            <div className="p-3 sm:p-4 rounded-xl border border-cyan-500/20 bg-cyan-500/15 backdrop-blur-xl space-y-1.5 sm:space-y-2 shadow-2xl text-[10px] sm:text-xs">
+                                                <div className="flex items-center gap-2 text-cyan-400 font-bold"><Sparkles size={14}/> Follow-up: #{selectedDetection.tooth_number}</div>
+                                                <p className="text-text-muted leading-relaxed">Monitor structural integrity. Ensure proper marginal seal.</p>
                                             </div>
                                         )}
                                     </div>
-                                </div>
+                                </motion.div>
                             )}
                         </div>
 
                         {/* RIGHT: LIST / GRID VIEW */}
-                        <div className="flex-[2] flex flex-col bg-surface overflow-hidden">
+                        <div className="flex-[2] flex flex-col bg-surface overflow-hidden border-t lg:border-t-0 lg:border-l border-border pb-20 sm:pb-0">
                             <div className="p-4 border-b border-border bg-[#161B22]/50">
-                                <p className="text-[10px] font-bold uppercase text-text-muted tracking-widest">{viewMode === 'grid' ? 'Dental Chart View' : 'Detection Stream'}</p>
+                                <p className="text-[9px] sm:text-[10px] font-bold uppercase text-text-muted tracking-widest">{viewMode === 'grid' ? 'Dental Chart View' : 'Detection Stream'}</p>
                             </div>
-                            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar min-h-[400px]">
                                 {viewMode === 'grid' ? (
                                     <div className="space-y-6">
                                         <div>
@@ -666,8 +672,14 @@ export const AIScanPanel = () => {
             <AnimatePresence>
                 {selectedDetection && (
                     <>
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedDetection(null)} className="absolute inset-0 bg-black/40 backdrop-blur-[2px] z-40" />
-                        <motion.div initial={{ x: 400 }} animate={{ x: 0 }} exit={{ x: 400 }} className="absolute top-0 right-0 bottom-0 w-[400px] bg-surface border-l border-border shadow-2xl z-50 flex flex-col">
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedDetection(null)} className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-40" />
+                        <motion.div 
+                            initial={{ x: '100%' }} 
+                            animate={{ x: 0 }} 
+                            exit={{ x: '100%' }} 
+                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                            className="absolute top-0 right-0 bottom-0 w-full sm:w-[400px] max-w-full bg-surface border-l border-border shadow-2xl z-50 flex flex-col"
+                        >
                             <div className="p-6 border-b border-border flex items-center justify-between bg-[#161B22]/50">
                                 <div className="flex gap-4 items-center">
                                     <div className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-xl border" style={{ color: getClassColor(selectedDetection.class), borderColor: `${getClassColor(selectedDetection.class)}40`, backgroundColor: `${getClassColor(selectedDetection.class)}10` }}>{selectedDetection.tooth_number}</div>
