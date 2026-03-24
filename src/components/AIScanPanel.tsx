@@ -2,7 +2,22 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTreatmentStore } from '../store/useTreatmentStore';
 import type { ScanResult, ScanDetection } from '../types/dental';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RotateCcw, Sparkles, Brain, X, Grid, LayoutList } from 'lucide-react';
+import { 
+    Brain, 
+    UploadCloud, 
+    Sparkles, 
+    Check, 
+    AlertCircle, 
+    X, 
+    History, 
+    Activity,
+    LineChart,
+    ChevronRight,
+    Search,
+    Grid,
+    LayoutList,
+    RotateCcw
+} from 'lucide-react';
 
 /* ─── Standard OPG Tooth Map ─────────────────────────────────────────
    Anatomically accurate OPG tooth positions (Universal Numbering System)
@@ -415,20 +430,27 @@ export const AIScanPanel = () => {
                 <div className="flex-1 flex flex-col lg:flex-row gap-6 p-6 overflow-y-auto lg:overflow-hidden pb-32">
                     <div className="flex-none lg:flex-[5] min-h-[300px] lg:min-h-0 rounded-2xl border border-border bg-surface relative flex items-center justify-center overflow-hidden">
                         <img src={preview} alt="Scan" className="max-w-full max-h-full object-contain opacity-30 grayscale" />
-                        <div className="absolute inset-x-0 h-[2px] bg-primary z-10" style={{ animation: 'scanline 3s infinite linear' }} />
+                        {scanning && <div className="absolute inset-x-0 h-[2px] bg-primary z-10" style={{ animation: 'scanline 3s infinite linear' }} />}
                         <div className="absolute inset-0 bg-primary/5 backdrop-blur-[1px]" />
                     </div>
                     <div className="flex-none lg:flex-[3] rounded-2xl border border-border bg-surface flex flex-col overflow-visible lg:overflow-hidden">
                         <div className="p-5 border-b border-border bg-[#161B22]/50 flex items-center justify-between">
                             <h3 className="font-bold flex items-center gap-2"><Brain size={18} className="text-primary"/> Analysis Mode</h3>
-                            <span className="text-[10px] font-black tracking-widest uppercase text-primary">In Progress</span>
+                            <span className="text-[10px] font-black tracking-widest uppercase text-primary">{scanning ? 'In Progress' : 'Ready'}</span>
                         </div>
                         <div className="flex-1 p-6 font-mono text-[10px] space-y-2 overflow-y-auto bg-[#0D1117] custom-scrollbar">
-                            {LOG_LINES.slice(0, logIndex + 1).map((line, i) => (
+                            {scanning && LOG_LINES.slice(0, logIndex + 1).map((line, i) => (
                                 <div key={i} className="text-success flex items-center gap-2">
                                     <span className="w-1 h-1 bg-success rounded-full" /> {line}
                                 </div>
                             ))}
+                            {!scanning && (
+                                <div className="h-full flex flex-col items-center justify-center text-text-muted opacity-50 space-y-2">
+                                    <Activity size={24} />
+                                    <p className="font-bold">System Ready</p>
+                                    <p className="text-[9px]">Click below to begin full clinical analysis</p>
+                                </div>
+                            )}
                         </div>
                         <div className="p-6 border-t border-border bg-[#0D1117]">
                             <div className="flex justify-between mb-2"><span className="text-[10px] text-text-muted">SCAN PROGRESS</span><span className="font-bold text-primary">{Math.round(scanProgress)}%</span></div>
