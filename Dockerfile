@@ -7,22 +7,24 @@ RUN apt-get clean && apt-get update --fix-missing && \
     apt-get install -y nginx build-essential && \
     rm -rf /var/lib/apt/lists/*
 
-# Set Node memory limit for the build
+# Set Node memory limit and suppress progress bars
 ENV NODE_OPTIONS="--max-old-space-size=2048"
+ENV NPM_CONFIG_PROGRESS=false
+ENV NPM_CONFIG_LOGLEVEL=error
 
 # Set working directory
 WORKDIR /app
 
-# Copy dependency files first to leverage caching and avoid local node_modules
-COPY package*.json ./
-COPY server/package*.json ./server/
+# Copy dependency files (without lockfiles since they are in .dockerignore)
+COPY package.json ./
+COPY server/package.json ./server/
 COPY requirements.txt ./
 
 # Install root dependencies
-RUN npm install --no-audit --no-fund --foreground-scripts
+RUN npm cache clean --force && npm install --no-audit --no-fund --foreground-scripts
 
 # Install Node Backend dependencies
-RUN cd server && npm install --no-audit --no-fund --foreground-scripts
+RUN cd server && npm cache clean --force && npm install --no-audit --no-fund --foreground-scripts
 
 # Install AI Backend dependencies
 RUN pip install --no-cache-dir -r requirements.txt
