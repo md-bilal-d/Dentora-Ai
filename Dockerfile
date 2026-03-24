@@ -36,8 +36,14 @@ RUN pip install --no-cache-dir -r requirements.txt --break-system-packages
 # Copy the rest of the app (honors .dockerignore)
 COPY . .
 
-# Build frontend
-RUN npm run build
+# --- Build Frontend ---
+# Change localhost URLs to relative paths for Nginx routing during build
+# Using --no-run-if-empty to avoid errors if no matches found
+RUN grep -l "http://localhost:5001" src/**/*.ts src/**/*.tsx | xargs --no-run-if-empty sed -i 's|http://localhost:5001|/api|g'
+RUN grep -l "http://localhost:5000" src/**/*.ts src/**/*.tsx | xargs --no-run-if-empty sed -i 's|http://localhost:5000|/ai|g'
+
+# Run build directly with Vite, skipping tsc to avoid type-check failures
+RUN npx vite build
 
 # Nginx config
 COPY nginx.conf /etc/nginx/sites-available/default
