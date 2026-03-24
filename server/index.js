@@ -28,8 +28,32 @@ app.use(express.json());
 
 // Database Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'process.env.MONGODB_URI';
+
+async function seedMasterAccount() {
+  try {
+    const masterEmail = 'zoro@gmail.com';
+    const existing = await User.findOne({ email: masterEmail });
+    if (!existing) {
+      const masterUser = new User({
+        name: 'Dr. Zoro',
+        email: masterEmail,
+        password: '123456', // Will be hashed by pre-save hook
+        clinicName: 'Dentora Master Clinic',
+        specialty: 'Oral Surgeon'
+      });
+      await masterUser.save();
+      console.log('✅ Master account (zoro@gmail.com) seeded successfully.');
+    }
+  } catch (err) {
+    console.error('❌ Failed to seed master account:', err.message);
+  }
+}
+
 mongoose.connect(MONGODB_URI, { family: 4 })
-  .then(() => console.log('✅ Connected to MongoDB Atlas - DentalCare_DB'))
+  .then(() => {
+    console.log('✅ Connected to MongoDB Atlas - DentalCare_DB');
+    seedMasterAccount();
+  })
   .catch(err => console.error('❌ MongoDB connection error (Check MONGODB_URI):', err.message));
 
 // Middleware to verify JWT

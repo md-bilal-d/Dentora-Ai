@@ -106,7 +106,7 @@ export const useTreatmentStore = create<TreatmentState>((set, get) => ({
         set({ treatments: newTreatments, selectedTooth: toothId });
 
         // Auto-sync treatment additions to MongoDB
-        fetch(`http://127.0.0.1:5000/api/patients/${state.patientInfo.id}`, {
+        fetch(`/api/patients/${state.patientInfo.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ treatments: Array.from(newTreatments.values()) })
@@ -120,7 +120,7 @@ export const useTreatmentStore = create<TreatmentState>((set, get) => ({
         set({ treatments: newTreatments });
 
         // Auto-sync treatment removals to MongoDB
-        fetch(`http://127.0.0.1:5000/api/patients/${state.patientInfo.id}`, {
+        fetch(`/api/patients/${state.patientInfo.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ treatments: Array.from(newTreatments.values()) })
