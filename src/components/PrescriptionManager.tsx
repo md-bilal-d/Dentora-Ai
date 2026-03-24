@@ -20,7 +20,7 @@ interface Prescription {
     status: RxStatus;
 }
 
-const API_BASE = 'http://localhost:5001/api';
+const API_BASE = '/api';
 
 const MEDICINE_DB = [
     'Amoxicillin', 'Metronidazole', 'Ibuprofen', 'Paracetamol', 'Clindamycin',

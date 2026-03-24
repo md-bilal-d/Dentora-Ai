@@ -199,7 +199,7 @@ export const useTreatmentStore = create<TreatmentState>((set, get) => ({
                 set({ treatments: latestTreatments });
 
                 // Sync staggered detections locally to cloud 
-                fetch(`http://localhost:5001/api/patients/${get().patientInfo.id}`, {
+                fetch(`/api/patients/${get().patientInfo.id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ treatments: Array.from(latestTreatments.values()) })

@@ -23,7 +23,7 @@ interface AuthState {
   checkAuth: () => Promise<void>;
 }
 
-const API_BASE = 'http://localhost:5001/api/auth';
+const API_BASE = '/api/auth';
 
 const DEMO_USER: User = {
   id: 'DEMO-001',

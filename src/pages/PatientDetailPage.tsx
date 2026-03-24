@@ -44,7 +44,7 @@ export default function PatientDetailPage() {
       });
       
       // Fetch prescriptions for the export report
-      fetch(`http://localhost:5001/api/prescriptions/${patient.id}`)
+      fetch(`/api/prescriptions/${patient.id}`)
         .then(res => res.json())
         .then(data => setPrescriptions(data))
         .catch(err => console.error('Error fetching prescriptions for report:', err));

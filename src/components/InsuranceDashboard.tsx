@@ -7,7 +7,7 @@ import { useTreatmentStore } from '../store/useTreatmentStore';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const API_BASE = 'http://localhost:5001/api';
+const API_BASE = '/api';
 
 const formatINR = (amount: number) => {
     if (typeof amount !== 'number' || isNaN(amount)) return '₹0';

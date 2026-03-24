@@ -278,7 +278,7 @@ export const AIScanPanel = () => {
                 const formData = new FormData();
                 formData.append("image", fileToUpload!);
 
-                const response = await fetch('http://localhost:5000/api/scan', {
+                const response = await fetch('/ai/api/scan', {
                     method: 'POST',
                     body: formData
                 });
@@ -310,8 +310,8 @@ export const AIScanPanel = () => {
 
                 scanResult = {
                     scan_id: data.scan_id || `scan_${Date.now()}`,
-                    original_image: data.original_image ? `http://localhost:5000${data.original_image}` : preview,
-                    annotated_image: data.annotated_image ? `http://localhost:5000${data.annotated_image}` : preview,
+                    original_image: data.original_image ? `/ai${data.original_image}` : preview,
+                    annotated_image: data.annotated_image ? `/ai${data.annotated_image}` : preview,
                     disease_score: diseaseScore,
                     total_detections: mappedDetections.length,
                     detections: mappedDetections
