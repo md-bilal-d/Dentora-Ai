@@ -1,7 +1,7 @@
 # Use a standard stable Node base
 FROM node:20-bookworm-slim
 
-# Install Python, Nginx, and build tools
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
@@ -9,9 +9,10 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables
-ENV NODE_OPTIONS="--max-old-space-size=2048"
-ENV NPM_CONFIG_LOGLEVEL=info
+# Set robust environment variables
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV NPM_CONFIG_LOGLEVEL=error
+ENV CI=true
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
@@ -21,34 +22,25 @@ COPY package.json ./
 COPY server/package.json ./server/
 COPY requirements.txt ./
 
-# Diagnostic: Verify files are present
-RUN ls -la && ls -la server/
+# --- CONSOLIDATED INSTALL & BUILD ---
+# Combining everything into one RUN to avoid layer overhead and cache flakiness
+RUN npm install --no-audit --no-fund --unsafe-perm && \
+    npm install --prefix server --omit=dev --no-audit --no-fund --unsafe-perm && \
+    pip install --no-cache-dir -r requirements.txt --break-system-packages && \
+    npm cache clean --force
 
-# Install root dependencies
-RUN npm install --no-audit --no-fund --unsafe-perm
-
-# Install Node Backend dependencies (Production only, using --prefix)
-RUN npm install --prefix server --omit=dev --no-audit --no-fund --unsafe-perm
-
-# Install AI Backend dependencies
-RUN pip install --no-cache-dir -r requirements.txt --break-system-packages
-
-# Copy the rest of the app (honors .dockerignore)
+# Copy the rest of the app
 COPY . .
 
 # --- Build Frontend ---
-# Change localhost URLs to relative paths for Nginx routing during build
-# Using --no-run-if-empty and || true to avoid build failures
-RUN grep -l "http://localhost:5001" src/**/*.ts src/**/*.tsx | xargs --no-run-if-empty sed -i 's|http://localhost:5001|/api|g' || true
-RUN grep -l "http://localhost:5000" src/**/*.ts src/**/*.tsx | xargs --no-run-if-empty sed -i 's|http://localhost:5000|/ai|g' || true
-
-# Run build directly with Vite, skipping tsc to avoid type-check failures
-RUN npx vite build
+RUN (grep -l "http://localhost:5001" src/**/*.ts src/**/*.tsx | xargs --no-run-if-empty sed -i 's|http://localhost:5001|/api|g' || true) && \
+    (grep -l "http://localhost:5000" src/**/*.ts src/**/*.tsx | xargs --no-run-if-empty sed -i 's|http://localhost:5000|/ai|g' || true) && \
+    npx vite build
 
 # Nginx config
 COPY nginx.conf /etc/nginx/sites-available/default
 
-# Permissions & User setup
+# Final permissions
 RUN chmod +x start.sh && \
     chown -R 1000:1000 /app /var/lib/nginx /var/log/nginx /etc/nginx
 
