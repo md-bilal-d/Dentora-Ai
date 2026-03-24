@@ -1,9 +1,14 @@
 # Use a base image with Node.js and Python
 FROM nikolaik/python-nodejs:python3.10-nodejs20
 
-# Install Nginx with resilience
+# Install Nginx with resilience and build tools for native packages
 USER root
-RUN apt-get clean && apt-get update --fix-missing && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
+RUN apt-get clean && apt-get update --fix-missing && \
+    apt-get install -y nginx build-essential && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set Node memory limit for the build
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 
 # Set working directory
 WORKDIR /app
@@ -14,10 +19,10 @@ COPY server/package*.json ./server/
 COPY requirements.txt ./
 
 # Install root dependencies
-RUN npm install --no-audit --no-fund
+RUN npm install --no-audit --no-fund --foreground-scripts
 
 # Install Node Backend dependencies
-RUN cd server && npm install --no-audit --no-fund
+RUN cd server && npm install --no-audit --no-fund --foreground-scripts
 
 # Install AI Backend dependencies
 RUN pip install --no-cache-dir -r requirements.txt
