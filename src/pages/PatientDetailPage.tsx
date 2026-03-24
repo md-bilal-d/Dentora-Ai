@@ -270,7 +270,7 @@ export default function PatientDetailPage() {
       y += 10;
 
       scanDetections.forEach((det, idx) => {
-        const actionText = det.recommendedAction || det.notes || '-';
+        const actionText = String(det.recommendedAction || det.notes || '-');
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         
@@ -284,7 +284,7 @@ export default function PatientDetailPage() {
         doc.setTextColor(17, 24, 39);
         doc.text(String(det.tooth_number ?? '-'), x1 + 2, y + 3);
 
-        const cond = doc.splitTextToSize(det.class || '-', c2 - 4);
+        const cond = doc.splitTextToSize(String(det.class || '-'), c2 - 4);
         doc.text(cond, x2 + 2, y + 3);
 
         const sev = (det.severity || '').toUpperCase();
@@ -342,7 +342,7 @@ export default function PatientDetailPage() {
 
       combinedTreatments.forEach((t: any, idx) => {
         const isAi = t.class !== undefined;
-        let treatmentName = isAi ? t.class : String(t.mode || '-');
+        let treatmentName = String(isAi ? t.class : (t.mode || '-'));
         let toothNo = String(isAi ? t.tooth_number : t.toothNumber ?? '-');
         let dateObj = isAi ? (aiPayload?.timestamp || today) : t.date;
         let cName = doc.splitTextToSize(treatmentName, t1 - 4);
@@ -509,8 +509,8 @@ export default function PatientDetailPage() {
       addFooter(p, totalPages);
     }
 
-    const dateTag = today.toISOString().split('T')[0];
-    doc.save(`Dentora_${patient.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
+    const safeName = String(patient?.name || 'Patient').replace(/\s+/g, '_');
+    doc.save(`Dentora_${safeName}_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   return (
