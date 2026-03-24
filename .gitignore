@@ -11,7 +11,7 @@ build_err.txt
 
 # Dependencies
 node_modules
-dist
+# dist — NOT ignored, needed for HF deployment
 dist-ssr
 *.local
 
