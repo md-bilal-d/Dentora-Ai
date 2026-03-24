@@ -582,7 +582,7 @@ export const ToothPainLocator = () => {
             </AnimatePresence>
 
             {/* Left: SVG Interactive Chart */}
-            <div className="flex-[1.5] flex flex-col rounded-2xl border border-border overflow-hidden bg-[#161B22]">
+            <div className="flex-initial lg:flex-[1.5] min-h-[450px] lg:min-h-0 flex flex-col rounded-2xl border border-border overflow-hidden bg-[#161B22]">
                 
                 {/* AI Summary Bar Overlay */}
                 {scanDetections.length > 0 ? (
@@ -1008,8 +1008,8 @@ export const ToothPainLocator = () => {
                 </div>
             </div>
 
-            <div className="flex-1 w-full lg:max-w-[420px] rounded-2xl border border-border p-5 flex flex-col overflow-hidden bg-[#161B22]">
-                    <div className="mb-5 shrink-0 flex items-center justify-between">
+            <div className="flex-initial lg:flex-1 w-full lg:max-w-[420px] min-h-[400px] lg:min-h-0 rounded-2xl border border-border p-5 flex flex-col items-stretch bg-[#161B22] overflow-y-auto lg:overflow-hidden">
+                <div className="mb-5 shrink-0 flex items-center justify-between">
                         <h2 className="text-xl font-bold text-text" style={{ fontFamily: 'var(--font-serif)' }}>Symptom History</h2>
                         <div className="flex bg-[#0D1117] p-1 rounded-lg border border-border">
                             <button onClick={() => setFilter('all')} className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${filter === 'all' ? 'bg-primary text-white' : 'text-text-secondary hover:text-text'}`}>All</button>
