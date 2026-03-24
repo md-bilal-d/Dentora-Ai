@@ -470,16 +470,21 @@ def scan_xray():
     if file.filename == "":
         return jsonify({"error": "Empty filename."}), 400
 
-    # Save uploaded image
-    scan_id = str(uuid.uuid4())[:8]
-    ext = os.path.splitext(file.filename)[1] or ".jpg"
-    input_filename = f"{scan_id}_input{ext}"
-    input_path = os.path.join(RESULTS_DIR, input_filename)
-    file.save(input_path)
+    try:
+        # Save uploaded image
+        scan_id = str(uuid.uuid4())[:8]
+        ext = os.path.splitext(file.filename)[1] or ".jpg"
+        input_filename = f"{scan_id}_input{ext}"
+        input_path = os.path.join(RESULTS_DIR, input_filename)
+        file.save(input_path)
 
-    # Get image dimensions for tooth numbering
-    img = Image.open(input_path)
-    img_width, img_height = img.size
+        # Get image dimensions for tooth numbering
+        img = Image.open(input_path)
+        img_width, img_height = img.size
+        print(f"Scanning image: {input_filename} ({img_width}x{img_height})", flush=True)
+    except Exception as e:
+        print(f"ERROR DURING IMAGE PREPARATION: {e}", flush=True)
+        return jsonify({"error": f"Failed to prepare image: {str(e)}"}), 500
 
     try:
         # Run inference
@@ -556,22 +561,22 @@ def scan_xray():
 
     # Calculate overall disease score (0-100)
     severity_weights = {"high": 1.0, "medium": 0.6, "low": 0.3, "info": 0.1}
+    disease_score = 0.0
     if detections:
         disease_detections = [d for d in detections if d["severity"] in ("high", "medium")]
         if disease_detections:
-            weighted_score = sum(
-                d["confidence"] * severity_weights[d["severity"]] for d in disease_detections
-            ) / len(disease_detections)
-            disease_score = min(round(weighted_score, 1), 100)
+            weighted_sum = sum(float(d["confidence"]) * severity_weights[d["severity"]] for d in disease_detections)
+            weighted_score = weighted_sum / len(disease_detections)
+            disease_score = float(min(round(weighted_score, 1), 100))
         else:
-            disease_score = 0
-    else:
-        disease_score = 0
+            disease_score = 0.0
+
+    print(f"Scan complete: {scan_id}, Found {len(detections)} detections.", flush=True)
 
     return jsonify({
         "scan_id": scan_id,
         "detections": detections,
-        "total_detections": len(detections),
+        "total_detections": int(len(detections)),
         "disease_score": disease_score,
         "annotated_image": f"/results/{annotated_filename}",
         "original_image": f"/results/{input_filename}",
