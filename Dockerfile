@@ -24,11 +24,11 @@ COPY requirements.txt ./
 # Diagnostic: Verify files are present
 RUN ls -la && ls -la server/
 
-# Install root dependencies with unsafe-perm to avoid root permission issues
+# Install root dependencies
 RUN npm install --no-audit --no-fund --unsafe-perm
 
-# Install Node Backend dependencies
-RUN cd server && npm install --no-audit --no-fund --unsafe-perm
+# Install Node Backend dependencies (Production only, using --prefix)
+RUN npm install --prefix server --omit=dev --no-audit --no-fund --unsafe-perm
 
 # Install AI Backend dependencies
 RUN pip install --no-cache-dir -r requirements.txt --break-system-packages
