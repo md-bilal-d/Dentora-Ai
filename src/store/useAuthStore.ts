@@ -90,22 +90,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       
       const data = await res.json();
       if (!res.ok) {
-        // DEMO BYPASS: If account doesn't exist or wrong password, just force log them in!
-        // This ensures the judges can type literally anything and get into the app.
-        const bypassUser = {
-          id: 'DEMO-' + Math.random().toString(36).substr(2, 6),
-          email: email,
-          name: 'Dr. ' + (email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1)),
-          clinicName: 'Dentora Clinic',
-          specialty: 'Clinical AI',
-          role: 'doctor',
-        };
-        
-        localStorage.setItem('dentora_auth_token', 'demo_token_bypass');
-        localStorage.setItem('dentora_user', JSON.stringify(bypassUser));
-        
-        set({ user: bypassUser, token: 'demo_token_bypass', isAuthenticated: true, isLoading: false, error: null });
-        return { success: true };
+        set({ isLoading: false, error: data.error });
+        return { success: false, error: data.error };
       }
       
       localStorage.setItem('dentora_auth_token', data.token);
