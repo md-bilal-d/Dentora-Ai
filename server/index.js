@@ -27,9 +27,10 @@ app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:5174', 'http:
 app.use(express.json());
 
 // Database Connection
-mongoose.connect(process.env.MONGODB_URI, { family: 4 })
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/fallback';
+mongoose.connect(MONGODB_URI, { family: 4 })
   .then(() => console.log('✅ Connected to MongoDB Atlas - DentalCare_DB'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
+  .catch(err => console.error('❌ MongoDB connection error (Check MONGODB_URI):', err.message));
 
 // Middleware to verify JWT
 const auth = async (req, res, next) => {
