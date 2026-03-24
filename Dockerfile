@@ -24,10 +24,11 @@ RUN npm install --prefix server --omit=dev --no-audit --no-fund --unsafe-perm &&
 # Install Python dependencies (ultralytics brings its own torch)
 RUN pip install --no-cache-dir -r requirements.txt --break-system-packages
 
-# Configure nginx and set permissions
+# Configure nginx and set permissions for non-root operation
 RUN cp nginx.conf /etc/nginx/sites-available/default && \
     chmod +x start.sh && \
-    chown -R 1000:1000 /app /var/lib/nginx /var/log/nginx /etc/nginx
+    mkdir -p /tmp /run/nginx && \
+    chown -R 1000:1000 /app /var/lib/nginx /var/log/nginx /etc/nginx /run/nginx /tmp
 
 USER 1000
 EXPOSE 7860
