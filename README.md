@@ -1,3 +1,12 @@
+---
+title: Dentora
+emoji: 🦷
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+---
+
 # 🦷 Dentora AI: Dental Intelligence Engine
 
 [![GitHub Stars](https://img.shields.io/github/stars/md-bilal-d/Dentora-Ai?style=for-the-badge)](https://github.com/md-bilal-d/Dentora-Ai)
