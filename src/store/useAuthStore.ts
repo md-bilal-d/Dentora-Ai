@@ -34,7 +34,7 @@ const DEMO_USER: User = {
   role: 'doctor',
 };
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   token: null,
   isAuthenticated: false,
@@ -99,12 +99,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       
       set({ user: data.user, token: data.token, isAuthenticated: true, isLoading: false });
       return { success: true };
-    } catch (err) {
-      // Fallback: If backend is down, log them in via the Quick Demo path instead of hanging so the Judges don't get stuck
-      localStorage.setItem('dentora_auth_token', 'demo_token_bypass');
-      localStorage.setItem('dentora_user', JSON.stringify(DEMO_USER));
-      set({ user: DEMO_USER, token: 'demo_token_bypass', isAuthenticated: true, isLoading: false });
-      return { success: true };
+    } catch (err: any) {
+      const errorMsg = 'Service unreachable. Please check your connection.';
+      set({ isLoading: false, error: errorMsg });
+      return { success: false, error: errorMsg };
     }
   },
 

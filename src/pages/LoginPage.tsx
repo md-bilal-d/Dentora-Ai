@@ -4,8 +4,8 @@ import { useAuthStore } from '../store/useAuthStore';
 import { Eye, EyeOff, Zap, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('doctor@clinic.com');
-  const [password, setPassword] = useState('dentora2026');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { login, demoLogin, isLoading, error } = useAuthStore();
   const navigate = useNavigate();
