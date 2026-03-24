@@ -412,13 +412,13 @@ export const AIScanPanel = () => {
                     </motion.div>
                 </div>
             ) : !result ? (
-                <div className="flex-1 flex flex-col lg:flex-row gap-6 p-6 overflow-y-auto lg:overflow-hidden">
-                    <div className="flex-initial lg:flex-[5] min-h-[400px] lg:min-h-0 rounded-2xl border border-border bg-surface relative flex items-center justify-center overflow-hidden">
+                <div className="flex-1 flex flex-col lg:flex-row gap-6 p-6 overflow-y-auto lg:overflow-hidden pb-32">
+                    <div className="flex-none lg:flex-[5] min-h-[300px] lg:min-h-0 rounded-2xl border border-border bg-surface relative flex items-center justify-center overflow-hidden">
                         <img src={preview} alt="Scan" className="max-w-full max-h-full object-contain opacity-30 grayscale" />
                         <div className="absolute inset-x-0 h-[2px] bg-primary z-10" style={{ animation: 'scanline 3s infinite linear' }} />
                         <div className="absolute inset-0 bg-primary/5 backdrop-blur-[1px]" />
                     </div>
-                    <div className="flex-initial lg:flex-[3] min-h-fit lg:min-h-0 rounded-2xl border border-border bg-surface flex flex-col overflow-visible lg:overflow-hidden">
+                    <div className="flex-none lg:flex-[3] rounded-2xl border border-border bg-surface flex flex-col overflow-visible lg:overflow-hidden">
                         <div className="p-5 border-b border-border bg-[#161B22]/50 flex items-center justify-between">
                             <h3 className="font-bold flex items-center gap-2"><Brain size={18} className="text-primary"/> Analysis Mode</h3>
                             <span className="text-[10px] font-black tracking-widest uppercase text-primary">In Progress</span>
