@@ -19,6 +19,9 @@ WORKDIR /app
 # Copy everything (whitelist .dockerignore ensures minimal context)
 COPY . .
 
+# Install Node dependencies and build frontend
+RUN npm install && npm run build
+
 # Install Node backend dependencies
 RUN npm install --prefix server --omit=dev --no-audit --no-fund --unsafe-perm && \
     npm cache clean --force
