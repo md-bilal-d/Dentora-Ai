@@ -293,16 +293,23 @@ export const ToothPainLocator = () => {
                 const data = await response.json();
                 if (data.error) throw new Error(data.error);
 
-                const mappedDetections: ScanDetection[] = (data.detections || []).map((f: any) => ({
-                    tooth_number: f.tooth_number || 0,
-                    class: f.class || 'Unknown',
-                    severity: f.severity || 'info',
-                    confidence: typeof f.confidence === 'number' && f.confidence <= 1 ? f.confidence * 100 : parseFloat(f.confidence),
-                    bbox: [f.bbox[0], f.bbox[1], f.bbox[2], f.bbox[3]],
-                    description: `Detected ${f.class}`,
-                    recommendedAction: `Evaluate ${f.class}`,
-                    notes: `AI detected ${f.class} with ${f.confidence}% confidence.`
-                }));
+                const mappedDetections: ScanDetection[] = (data.detections || []).map((f: any) => {
+                    let recommendation = `Evaluate ${f.class}`;
+                    if (f.class === 'Caries') recommendation = "Schedule minimally invasive restoration. Consider fluoride varnish application on adjacent teeth.";
+                    else if (f.class === 'Healthy') recommendation = "No intervention required. Maintain current hygiene protocol.";
+                    else if (f.class === 'Root Canal Treatment' || f.class === 'Crown') recommendation = "Monitor structural integrity. Ensure proper marginal seal in subsequent checkups.";
+
+                    return {
+                        tooth_number: f.tooth_number || 0,
+                        class: f.class || 'Unknown',
+                        severity: f.severity || 'info',
+                        confidence: typeof f.confidence === 'number' && f.confidence <= 1 ? f.confidence * 100 : parseFloat(f.confidence),
+                        bbox: [f.bbox[0], f.bbox[1], f.bbox[2], f.bbox[3]],
+                        description: f.class === 'Healthy' ? 'Tooth appears healthy.' : `Detected ${f.class} - ${f.severity} severity.`,
+                        recommendedAction: recommendation,
+                        notes: `AI detected ${f.class} with ${f.confidence}% confidence.`
+                    };
+                });
 
                 scanResult = {
                     scan_id: data.scan_id || `scan_${Date.now()}`,
@@ -749,7 +756,7 @@ export const ToothPainLocator = () => {
                                                         padding: '2px 5px', borderRadius: '2px'
                                                     }}
                                                 >
-                                                    T{det.tooth_number} {det.class}
+                                                    T{det.tooth_number} {det.class} {det.confidence.toFixed(1)}%
                                                 </motion.div>
                                             </div>
                                         );
