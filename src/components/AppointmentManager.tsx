@@ -155,25 +155,25 @@ export const AppointmentManager = () => {
     const weekDays = getDaysInCurrentWeek();
 
     return (
-        <div className="w-full h-full flex gap-6 overflow-hidden" style={{ fontFamily: 'var(--font-sans)', color: 'var(--text)' }}>
+        <div className="w-full h-full flex flex-col lg:flex-row gap-6 lg:overflow-hidden overflow-y-auto pb-20 lg:pb-0" style={{ fontFamily: 'var(--font-sans)', color: 'var(--text)' }}>
             
             {/* Main Content Area */}
-            <div className="flex-1 flex flex-col min-w-0 rounded-2xl border border-border overflow-hidden" style={{ backgroundColor: '#161B22' }}>
+            <div className="flex-1 flex flex-col min-h-[500px] lg:min-h-0 min-w-0 rounded-2xl border border-border lg:overflow-hidden" style={{ backgroundColor: '#161B22' }}>
                 {/* Toolbar */}
                 <div className="flex items-center justify-between p-5 border-b border-border">
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full justify-between">
                         <h2 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-serif)', color: '#f8fafc' }}>Schedule</h2>
-                        <div className="flex p-1 rounded-lg" style={{ backgroundColor: '#0D1117' }}>
-                            <button onClick={() => setView('month')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${view === 'month' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:text-text'}`}>Month</button>
-                            <button onClick={() => setView('week')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${view === 'week' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:text-text'}`}>Week Timeline</button>
+                        <div className="flex p-1 rounded-lg w-full sm:w-auto" style={{ backgroundColor: '#0D1117' }}>
+                            <button onClick={() => setView('month')} className={`flex-1 sm:flex-none px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${view === 'month' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:text-text'}`}>Month</button>
+                            <button onClick={() => setView('week')} className={`flex-1 sm:flex-none px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${view === 'week' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:text-text'}`}>Week Timeline</button>
                         </div>
                     </div>
                 </div>
 
                 {/* View Content */}
-                <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto overflow-x-auto p-4 md:p-6 custom-scrollbar">
                     {view === 'month' ? (
-                        <div className="max-w-4xl mx-auto custom-calendar-wrapper">
+                        <div className="max-w-4xl mx-auto custom-calendar-wrapper min-w-[300px]">
                             <Calendar 
                                 onChange={(val) => setSelectedDate(val as Date)} 
                                 value={selectedDate}
@@ -203,9 +203,9 @@ export const AppointmentManager = () => {
                             />
                         </div>
                     ) : (
-                        <div className="w-full relative min-w-[800px]">
+                        <div className="w-full relative min-w-[600px] md:min-w-[800px]">
                             <div className="flex border-b border-border pb-2 mb-4">
-                                <div className="w-20 shrink-0"></div>
+                                <div className="w-16 md:w-20 shrink-0"></div>
                                 {weekDays.map((dateObj, i) => {
                                     const dayName = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][i];
                                     return (
@@ -221,7 +221,7 @@ export const AppointmentManager = () => {
                             <div className="relative">
                                 {[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map(hour => (
                                     <div key={hour} className="flex h-20 border-b border-border/50 group">
-                                        <div className="w-20 shrink-0 flex items-start justify-end pr-4 text-xs font-medium text-text-muted">
+                                        <div className="w-16 md:w-20 shrink-0 flex items-start justify-end pr-2 md:pr-4 text-[10px] md:text-xs font-medium text-text-muted">
                                             {hour > 12 ? `${hour-12} PM` : hour === 12 ? '12 PM' : `${hour} AM`}
                                         </div>
                                         {[0,1,2,3,4,5].map(col => {
@@ -237,9 +237,9 @@ export const AppointmentManager = () => {
                                                             return (
                                                                 <div key={appt.id} className="absolute ml-1 rounded-md shadow-sm p-1.5 overflow-hidden border border-success/30 bg-[#121D16] z-10" style={style}>
                                                                     <div className="flex items-center justify-between">
-                                                                        <h4 className="text-[10px] font-bold text-success truncate">{appt.treatmentType}</h4>
+                                                                        <h4 className="text-[9px] md:text-[10px] font-bold text-success truncate">{appt.treatmentType}</h4>
                                                                     </div>
-                                                                    <p className="text-[9px] text-text-secondary truncate mt-0.5">{appt.doctor}</p>
+                                                                    <p className="text-[8px] md:text-[9px] text-text-secondary truncate mt-0.5">{appt.doctor}</p>
                                                                 </div>
                                                             );
                                                         }
@@ -257,7 +257,7 @@ export const AppointmentManager = () => {
             </div>
 
             {/* Sidebar */}
-            <div className="w-80 shrink-0 flex flex-col gap-6">
+            <div className="w-full lg:w-80 shrink-0 flex flex-col gap-6">
                 
                 <div className="rounded-2xl p-6 text-white shadow-[0_0_20px_rgba(47,129,247,0.2)]" style={{ background: 'linear-gradient(135deg, #2F81F7, #1F6FEB)' }}>
                     <h3 className="text-sm font-medium text-blue-100 flex items-center gap-2">

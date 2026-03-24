@@ -357,12 +357,12 @@ export const PrescriptionManager = () => {
                             <h1 className="text-2xl text-text" style={{ fontFamily: 'var(--font-serif)' }}>Rx & Medications</h1>
                             <p className="text-sm text-text-secondary mt-1">Manage prescriptions, schedule medication, and track interactions.</p>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <button onClick={() => setShowInteraction(true)} className="flex items-center gap-2 px-4 py-2.5 border border-danger/30 text-danger rounded-xl text-sm font-bold hover:bg-danger/10 transition-colors" style={{ backgroundColor: 'rgba(248,81,73,0.06)' }}>
-                                <ShieldAlert size={16} /> Interaction Checker
+                        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                            <button onClick={() => setShowInteraction(true)} className="flex-1 md:flex-none justify-center items-center flex gap-2 px-4 py-2.5 border border-danger/30 text-danger rounded-xl text-sm font-bold hover:bg-danger/10 transition-colors" style={{ backgroundColor: 'rgba(248,81,73,0.06)' }}>
+                                <ShieldAlert size={16} /> <span className="whitespace-nowrap">Interaction Check</span>
                             </button>
-                            <button onClick={() => { setForm(defaultForm()); setShowForm(true); }} className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-bold hover:bg-primary-hover transition-colors shadow-[0_0_15px_rgba(47,129,247,0.2)]">
-                                <Plus size={16} /> New Prescription
+                            <button onClick={() => { setForm(defaultForm()); setShowForm(true); }} className="flex-1 md:flex-none justify-center flex flex-nowrap whitespace-nowrap items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-bold hover:bg-primary-hover transition-colors shadow-[0_0_15px_rgba(47,129,247,0.2)]">
+                                <Plus size={16} /> New Rx
                             </button>
                         </div>
                     </div>
@@ -409,8 +409,8 @@ export const PrescriptionManager = () => {
                         )}
                     </div>
 
-                    {/* Daily Schedule — 4 columns */}
-                    <div className="grid grid-cols-4 gap-4 shrink-0">
+                    {/* Daily Schedule — Responsive Grid */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
                         {timingSlots.map(slot => {
                             const slotMeds = todayMeds.filter(m => m.schedule?.includes(slot));
                             const icon = slot === 'morning' ? '🌅' : slot === 'afternoon' ? '☀️' : slot === 'evening' ? '🌆' : '🌙';
