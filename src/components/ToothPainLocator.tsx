@@ -807,16 +807,11 @@ export const ToothPainLocator = () => {
                             const style = getStyleForCondition(condition, pulseGlow);
                             
                             if (aiDet && condition !== 'HEALTHY') {
-                                if (aiDet.severity === 'high') {
-                                    style.stroke = '#F85149';
-                                    style.glow = pulseGlow ? '0 0 24px rgba(248,81,73,1)' : '0 0 12px rgba(248,81,73,0.9)';
-                                } else if (aiDet.severity === 'medium') {
-                                    style.stroke = '#D29922';
-                                    style.glow = '0 0 12px rgba(210,153,34,0.9)';
-                                } else {
-                                    style.stroke = '#3FB950';
-                                    style.glow = '0 0 8px rgba(63,185,80,0.6)';
-                                }
+                                const exactColor = getClassColor(aiDet.class);
+                                style.stroke = exactColor;
+                                style.glow = pulseGlow && (aiDet.severity === 'high' || condition === 'PERIAPICAL_LESION') 
+                                    ? `0 0 24px ${exactColor}` 
+                                    : `0 0 12px ${exactColor}CC`;
                             }
 
                             const isLit = litUpTeeth.has(t.id);
@@ -995,16 +990,14 @@ export const ToothPainLocator = () => {
 
                 {/* Legend Below Chart */}
                 <div className="w-full border-t border-border p-4 bg-[#0D1117] flex justify-center gap-x-6 gap-y-3 flex-wrap shrink-0">
-                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#F85149]"></div><span className="text-[11px] font-bold text-text-muted">Cavity</span></div>
-                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#D29922]"></div><span className="text-[11px] font-bold text-text-muted">Root Canal</span></div>
-                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#2F81F7]"></div><span className="text-[11px] font-bold text-text-muted">Crown</span></div>
-                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#0891B2]"></div><span className="text-[11px] font-bold text-text-muted">Filling</span></div>
-                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#A371F7]"></div><span className="text-[11px] font-bold text-text-muted">Bone Loss</span></div>
-                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#FF0000] shadow-[0_0_8px_#FF0000]"></div><span className="text-[11px] font-bold text-text-muted">Infection</span></div>
-                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#7F1D1D] shadow-[0_0_8px_rgba(220,38,38,0.6)]"></div><span className="text-[11px] font-bold text-text-muted">Periapical Lesion</span></div>
-                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#E3B341]"></div><span className="text-[11px] font-bold text-text-muted">Impacted</span></div>
+                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#3FB950]"></div><span className="text-[11px] font-bold text-text-muted">Healthy</span></div>
+                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#F85149]"></div><span className="text-[11px] font-bold text-text-muted">Caries</span></div>
                     <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full border border-dashed border-[#8B949E] flex items-center justify-center"><X size={8} className="text-[#8B949E]" /></div><span className="text-[11px] font-bold text-text-muted">Missing</span></div>
-                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#30363D] flex items-center justify-center"><Check size={8} className="text-[#3FB950]" /></div><span className="text-[11px] font-bold text-text-muted">Healthy</span></div>
+                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#FFFFFF]"></div><span className="text-[11px] font-bold text-text-muted">Filling</span></div>
+                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#FF00FF]"></div><span className="text-[11px] font-bold text-text-muted">Root Canal Treatment</span></div>
+                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#00FFFF]"></div><span className="text-[11px] font-bold text-text-muted">Crown</span></div>
+                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#D29922]"></div><span className="text-[11px] font-bold text-text-muted">Implant</span></div>
+                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#7F1D1D] shadow-[0_0_8px_rgba(127,29,29,0.5)]"></div><span className="text-[11px] font-bold text-text-muted">Periapical Lesion</span></div>
                 </div>
             </div>
 
