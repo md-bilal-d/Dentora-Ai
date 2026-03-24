@@ -1,0 +1,14 @@
+node_modules
+server/node_modules
+dist
+.git
+.vscode
+*.log
+*.pt
+*.pth
+*.glb
+*.bin
+# We don't ignore models because we want Git LFS to handle them,
+# but Docker COPY will copy the LFS pointer or the file.
+# Actually, it's better to let Docker copy them if they are small,
+# but since they are large, we should be careful.

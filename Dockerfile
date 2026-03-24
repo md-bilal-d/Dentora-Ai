@@ -8,10 +8,12 @@ RUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
 # Set working directory
 WORKDIR /app
 
-# Copy all project files
-COPY . .
+# Copy dependency files first to leverage caching and avoid local node_modules
+COPY package*.json ./
+COPY server/package*.json ./server/
+COPY requirements.txt ./
 
-# Install root dependencies (concurrently, etc.)
+# Install root dependencies
 RUN npm install
 
 # Install Node Backend dependencies
@@ -19,6 +21,9 @@ RUN cd server && npm install
 
 # Install AI Backend dependencies
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy all project files (honors .dockerignore)
+COPY . .
 
 # --- Build Frontend ---
 # Change localhost URLs to relative paths for Nginx routing during build
