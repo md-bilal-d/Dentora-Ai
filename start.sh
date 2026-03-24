@@ -10,4 +10,4 @@ cd /app/server && node index.js &
 
 # Start Nginx in the foreground to keep container alive
 echo "Starting Nginx on Port 7860..."
-nginx -g "daemon off; pid /tmp/nginx.pid;"
+nginx -g "daemon off;"

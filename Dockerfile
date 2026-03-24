@@ -27,6 +27,9 @@ RUN pip install --no-cache-dir -r requirements.txt --break-system-packages
 # Configure nginx and set permissions for non-root operation
 RUN cp nginx.conf /etc/nginx/sites-available/default && \
     chmod +x start.sh && \
+    sed -i 's|/run/nginx.pid|/tmp/nginx.pid|g' /etc/nginx/nginx.conf && \
+    sed -i 's|^user |#user |g' /etc/nginx/nginx.conf && \
+    sed -i 's|/var/log/nginx/error.log|/tmp/nginx_error.log|g' /etc/nginx/nginx.conf && \
     mkdir -p /tmp /run/nginx && \
     chown -R 1000:1000 /app /var/lib/nginx /var/log/nginx /etc/nginx /run/nginx /tmp
 
