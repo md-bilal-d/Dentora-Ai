@@ -17,11 +17,15 @@ WORKDIR /app
 # Copy everything (whitelist .dockerignore ensures minimal context)
 COPY . .
 
-# Install backend dependencies, configure nginx, set permissions — all in one layer
+# Install Node backend dependencies
 RUN npm install --prefix server --omit=dev --no-audit --no-fund --unsafe-perm && \
-    pip install --no-cache-dir -r requirements.txt --break-system-packages && \
-    npm cache clean --force && \
-    cp nginx.conf /etc/nginx/sites-available/default && \
+    npm cache clean --force
+
+# Install Python dependencies (ultralytics brings its own torch)
+RUN pip install --no-cache-dir -r requirements.txt --break-system-packages
+
+# Configure nginx and set permissions
+RUN cp nginx.conf /etc/nginx/sites-available/default && \
     chmod +x start.sh && \
     chown -R 1000:1000 /app /var/lib/nginx /var/log/nginx /etc/nginx
 

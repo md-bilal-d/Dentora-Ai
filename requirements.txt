@@ -3,7 +3,3 @@ flask-cors
 ultralytics
 pillow
 numpy
-sqlite3-binary
-torch
-torchvision
---extra-index-url https://download.pytorch.org/whl/cpu
