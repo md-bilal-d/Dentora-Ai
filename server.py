@@ -481,63 +481,78 @@ def scan_xray():
     img = Image.open(input_path)
     img_width, img_height = img.size
 
-    # Run inference
-    results = model.predict(
-        source=input_path,
-        conf=0.25,
-        iou=0.45,
-        device=0,
-        verbose=False,
-    )
+    try:
+        # Run inference
+        results = model.predict(
+            source=input_path,
+            conf=0.25,
+            iou=0.45,
+            device=0,
+            verbose=False,
+        )
 
-    result = results[0]
+        result = results[0]
 
-    # Save annotated image
-    annotated_filename = f"{scan_id}_annotated.jpg"
-    annotated_path = os.path.join(RESULTS_DIR, annotated_filename)
-    annotated_img = result.plot()  # numpy array with boxes drawn
-    Image.fromarray(annotated_img[..., ::-1]).save(annotated_path, quality=90)
+        # Save annotated image
+        annotated_filename = f"{scan_id}_annotated.jpg"
+        annotated_path = os.path.join(RESULTS_DIR, annotated_filename)
+        annotated_img = result.plot()  # numpy array with boxes drawn
+        Image.fromarray(annotated_img[..., ::-1]).save(annotated_path, quality=90)
 
-    # Build detections list
-    detections = []
-    if result.boxes is not None and len(result.boxes) > 0:
-        for box in result.boxes:
-            cls_idx = int(box.cls[0])
-            conf = float(box.conf[0])
-            raw_class_name = result.names[cls_idx]
-            
-            # Normalize class names to Title Case for UI and SEVERITY_MAP compatibility
-            # e.g., 'caries' -> 'Caries', 'periapical lesion' -> 'Periapical Lesion' -> wait, SEVERITY_MAP uses 'Periapical lesion'
-            # Let's map it explicitly to match SEVERITY_MAP keys
-            class_name = raw_class_name.capitalize()
-            # Special cases for multi-word classes to match UI and SEVERITY_MAP
-            if raw_class_name.lower() == 'root canal treatment': class_name = 'Root Canal Treatment'
-            elif raw_class_name.lower() == 'bone loss': class_name = 'Bone loss'
-            elif raw_class_name.lower() == 'radiolucent line': class_name = 'Radiolucent line'
-            elif raw_class_name.lower() == 'retained root': class_name = 'Retained root'
-            elif raw_class_name.lower() == 'periapical lesion': class_name = 'Periapical lesion'
+        # Build detections list
+        detections = []
+        if result.boxes is not None and len(result.boxes) > 0:
+            for box in result.boxes:
+                cls_idx = int(box.cls[0])
+                conf = float(box.conf[0])
+                raw_class_name = result.names[cls_idx]
+                
+                class_name = raw_class_name.capitalize()
+                if raw_class_name.lower() == 'root canal treatment': class_name = 'Root Canal Treatment'
+                elif raw_class_name.lower() == 'bone loss': class_name = 'Bone loss'
+                elif raw_class_name.lower() == 'radiolucent line': class_name = 'Radiolucent line'
+                elif raw_class_name.lower() == 'retained root': class_name = 'Retained root'
+                elif raw_class_name.lower() == 'periapical lesion': class_name = 'Periapical lesion'
 
-            x, y, x2, y2 = box.xyxy[0].tolist()
-            w = x2 - x
-            h = y2 - y
-            severity = SEVERITY_MAP.get(class_name, "info")
+                x, y, x2, y2 = box.xyxy[0].tolist()
+                w = x2 - x
+                h = y2 - y
+                severity = SEVERITY_MAP.get(class_name, "info")
 
-            # Assign tooth number based on bbox position
-            tooth_num = assign_tooth_number([x, y, x2, y2], img_width, img_height)
+                tooth_num = assign_tooth_number([x, y, x2, y2], img_width, img_height)
 
-            detections.append({
-                "class": class_name,
-                "confidence": round(conf * 100, 1),
-                "severity": severity,
-                "bbox": [round(x, 1), round(y, 1), round(w, 1), round(h, 1)],
-                "tooth_number": tooth_num,
-            })
+                detections.append({
+                    "class": class_name,
+                    "confidence": round(conf * 100, 1),
+                    "severity": severity,
+                    "bbox": [round(x, 1), round(y, 1), round(w, 1), round(h, 1)],
+                    "tooth_number": tooth_num,
+                })
 
-    # ── NMS: Remove overlapping duplicate detections ──
-    detections = filter_overlapping_detections(detections, iou_threshold=0.45)
+        # ── NMS: Remove overlapping duplicate detections ──
+        detections = filter_overlapping_detections(detections, iou_threshold=0.45)
 
-    # Sort by confidence descending
-    detections.sort(key=lambda d: d["confidence"], reverse=True)
+        # Sort by confidence descending
+        detections.sort(key=lambda d: d["confidence"], reverse=True)
+
+    except Exception as e:
+        import traceback
+        trace_str = traceback.format_exc()
+        print(f"CRASH DURING INFERENCE: {trace_str}", flush=True)
+        return jsonify({
+            "scan_id": scan_id,
+            "detections": [{
+                "class": f"CRASH: {str(e)}", 
+                "confidence": 100.0, 
+                "severity": "high", 
+                "bbox": [50, 50, 500, 150], 
+                "tooth_number": 1
+            }],
+            "total_detections": 1,
+            "disease_score": 100.0,
+            "annotated_image": None,
+            "original_image": None
+        })
 
     # Calculate overall disease score (0-100)
     severity_weights = {"high": 1.0, "medium": 0.6, "low": 0.3, "info": 0.1}
