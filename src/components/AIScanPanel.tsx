@@ -402,7 +402,7 @@ export const AIScanPanel = () => {
                     <h2 className="text-2xl font-bold text-text mb-2">Upload Dental X-Ray</h2>
                     <p className="text-text-muted text-sm mb-6">Panoramic X-rays (OPG) • Universal Tooth Mapping</p>
                     <button className="px-8 py-3 bg-primary text-white rounded-xl font-bold hover:shadow-[0_0_20px_rgba(47,129,247,0.4)]">Browse Files</button>
-                    <button onClick={(e) => { e.stopPropagation(); handleFile('/scan_results/647a29da_input.jpg'); setTimeout(handleScan, 100); }} 
+                    <button onClick={(e) => { e.stopPropagation(); handleFile('/demo_scan.jpg'); setTimeout(handleScan, 100); }} 
                         className="mt-4 text-primary font-bold hover:underline flex items-center gap-2">
                         <Sparkles size={16} /> Try Demo Scan
                     </button>
