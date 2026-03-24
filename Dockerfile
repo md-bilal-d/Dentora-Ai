@@ -1,9 +1,9 @@
 # Use a base image with Node.js and Python
 FROM nikolaik/python-nodejs:python3.10-nodejs20
 
-# Install Nginx
+# Install Nginx with resilience
 USER root
-RUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
+RUN apt-get clean && apt-get update --fix-missing && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
@@ -14,10 +14,10 @@ COPY server/package*.json ./server/
 COPY requirements.txt ./
 
 # Install root dependencies
-RUN npm install
+RUN npm install --no-audit --no-fund
 
 # Install Node Backend dependencies
-RUN cd server && npm install
+RUN cd server && npm install --no-audit --no-fund
 
 # Install AI Backend dependencies
 RUN pip install --no-cache-dir -r requirements.txt
