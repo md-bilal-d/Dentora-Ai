@@ -1,0 +1,53 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+build_err.log
+build_err.txt
+
+# Dependencies
+node_modules
+dist
+dist-ssr
+*.local
+
+# Secrets and Databases
+.env
+server/.env
+*.db
+*.sqlite3
+
+# AI Models and Weights
+*.pt
+*.pth
+*.onnx
+best.pt
+yolo26n.pt
+yolov8n.pt
+
+# User-Generated / Training Data
+scan_results/
+runs/
+COCO/
+YOLO/
+
+# External Tools
+.gemini/
+.agents/
+.agent/
+
+# Editor and OS files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
