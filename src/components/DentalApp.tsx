@@ -52,7 +52,7 @@ export const DentalApp = () => {
             </div>
 
             {/* Active Content */}
-            <div className="flex-1 p-4 md:p-6 z-10 w-full max-w-[1400px] mx-auto min-h-[600px]">
+            <div className="flex-1 p-4 md:p-6 z-10 w-full max-w-[1400px] mx-auto md:min-h-[600px]">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={activeTab}
