@@ -14,20 +14,15 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Copy and install backend dependencies
-COPY server/package.json ./server/
-COPY requirements.txt ./
+# Copy everything (whitelist .dockerignore ensures minimal context)
+COPY . .
+
+# Install backend dependencies
 RUN npm install --prefix server --omit=dev --no-audit --no-fund --unsafe-perm && \
     pip install --no-cache-dir -r requirements.txt --break-system-packages && \
     npm cache clean --force
 
-# Copy only what is needed for production — NO "COPY . ."
-COPY dist/ ./dist/
-COPY server/index.js ./server/
-COPY server/models/ ./server/models/
-COPY server/seed.js ./server/
-COPY server.py ./
-COPY start.sh ./
+# Nginx config
 COPY nginx.conf /etc/nginx/sites-available/default
 
 # Final permissions

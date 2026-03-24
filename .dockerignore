@@ -1,15 +1,15 @@
-package-lock.json
-server/package-lock.json
-node_modules
-server/node_modules
-.git
-.vscode
-*.log
-*.pt
-*.pth
-*.glb
-*.bin
-# We don't ignore models because we want Git LFS to handle them,
-# but Docker COPY will copy the LFS pointer or the file.
-# Actually, it's better to let Docker copy them if they are small,
-# but since they are large, we should be careful.
+# Ignore everything first
+*
+
+# Then whitelist only what's needed for production
+!dist/
+!dist/**
+!server/index.js
+!server/package.json
+!server/seed.js
+!server/models/
+!server/models/**
+!server.py
+!start.sh
+!nginx.conf
+!requirements.txt
