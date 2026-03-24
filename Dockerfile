@@ -8,28 +8,26 @@ RUN apt-get update && apt-get install -y \
     nginx \
     && rm -rf /var/lib/apt/lists/*
 
-# Set robust environment variables
 ENV NODE_OPTIONS="--max-old-space-size=2048"
 ENV NPM_CONFIG_LOGLEVEL=error
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Copy dependency files for BACKEND only (Frontend is already built)
+# Copy and install backend dependencies
 COPY server/package.json ./server/
 COPY requirements.txt ./
-
-# --- CONSOLIDATED INSTALL ---
-# Skipping root (frontend) npm install to save RAM
 RUN npm install --prefix server --omit=dev --no-audit --no-fund --unsafe-perm && \
     pip install --no-cache-dir -r requirements.txt --break-system-packages && \
     npm cache clean --force
 
-# Copy pre-built frontend and the rest of the app
-# .dockerignore ensures we don't copy local node_modules
-COPY . .
-
-# Nginx config
+# Copy only what is needed for production — NO "COPY . ."
+COPY dist/ ./dist/
+COPY server/index.js ./server/
+COPY server/models/ ./server/models/
+COPY server/seed.js ./server/
+COPY server.py ./
+COPY start.sh ./
 COPY nginx.conf /etc/nginx/sites-available/default
 
 # Final permissions
