@@ -487,7 +487,7 @@ def scan_xray():
             source=input_path,
             conf=0.25,
             iou=0.45,
-            device=0,
+            device="cpu",
             verbose=False,
         )
 
