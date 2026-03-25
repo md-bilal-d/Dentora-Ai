@@ -468,6 +468,11 @@ export const AIScanPanel = () => {
 
                         {/* Progress Bar Area */}
                         <div className="p-6 border-t border-border bg-[#0D1117]">
+                            {scanning && (
+                                <p className="text-[10px] text-primary font-bold mb-3 animate-pulse">
+                                    AI analysis in progress — this may take 20-40 seconds on CPU mode. Please wait...
+                                </p>
+                            )}
                             <div className="flex justify-between mb-2"><span className="text-[10px] text-text-muted">SCAN PROGRESS</span><span className="font-bold text-primary">{Math.round(scanProgress)}%</span></div>
                             <div className="h-1 bg-border rounded-full overflow-hidden mb-6">
                                 <motion.div className="h-full bg-primary" animate={{ width: `${scanProgress}%` }} />

@@ -169,7 +169,8 @@ app.get('/api/billing/:patientId', async (req, res) => {
     const billing = await Billing.find({ patientId: req.params.patientId }).sort({ date: -1 });
     res.json(billing);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch billing records' });
+    console.error('[Billing API Error]:', error);
+    res.status(500).json({ error: 'Failed to fetch billing records', details: error.message });
   }
 });
 
@@ -214,7 +215,8 @@ app.get('/api/insurance/:patientId', async (req, res) => {
     const insurance = await Insurance.findOne({ patientId: req.params.patientId });
     res.json(insurance || null);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch insurance' });
+    console.error('[Insurance API Error]:', error);
+    res.status(500).json({ error: 'Failed to fetch insurance', details: error.message });
   }
 });
 
@@ -356,7 +358,8 @@ app.get('/api/prescriptions/:patientId', async (req, res) => {
     const prescriptions = await Prescription.find({ patientId: req.params.patientId }).sort({ createdAt: -1 });
     res.json(prescriptions);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch prescriptions' });
+    console.error('[Prescriptions API Error]:', error);
+    res.status(500).json({ error: 'Failed to fetch prescriptions', details: error.message });
   }
 });
 
@@ -406,7 +409,8 @@ app.get('/api/patients/:id/allergies', async (req, res) => {
     if (!patient) return res.status(404).json({ error: 'Patient not found' });
     res.json({ allergies: patient.allergies || [] });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch allergies' });
+    console.error('[Allergies API Error]:', error);
+    res.status(500).json({ error: 'Failed to fetch allergies', details: error.message });
   }
 });
 
