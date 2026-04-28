@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Plus, X, Calendar, Check, CheckCircle2, AlertCircle, UploadCloud, Activity, Sparkles, ArrowRight, Eye, Brain } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Plus, X, Calendar, Check, CheckCircle2, AlertCircle, UploadCloud, Activity, Sparkles, ArrowRight, Eye, Brain, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTreatmentStore } from '../store/useTreatmentStore';
 import Tooth3DModel from './Tooth3DModel';
