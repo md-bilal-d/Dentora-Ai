@@ -25,6 +25,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'dentora_super_secret_jwt_key_2026'
 // Middleware
 app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176'], credentials: true }));
 app.use(express.json());
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
 
 // Database Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'process.env.MONGODB_URI';
@@ -116,7 +120,8 @@ app.post('/api/auth/register', async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ error: 'Registration failed' });
+    console.error('Registration error:', error);
+    res.status(500).json({ error: 'Registration failed: ' + error.message });
   }
 });
 

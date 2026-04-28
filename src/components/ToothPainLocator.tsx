@@ -2,6 +2,10 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Plus, X, Calendar, Check, CheckCircle2, AlertCircle, UploadCloud, Activity, Sparkles, ArrowRight, Eye, Brain } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTreatmentStore } from '../store/useTreatmentStore';
+import Tooth3DModel from './Tooth3DModel';
+import VoiceNotes from './VoiceNotes';
+import TreatmentPlanView from './TreatmentPlanView';
+import BeforeAfterSimulator from './BeforeAfterSimulator';
 import type { ScanResult, ScanDetection } from '../types/dental';
 
 const generateArch = (isUpper: boolean, isChild: boolean = false) => {
@@ -352,6 +356,9 @@ export const ToothPainLocator = () => {
     };
     
     const [chartType, setChartType] = useState<'adult' | 'child'>('adult');
+    const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d');
+    const [showTreatmentPlan, setShowTreatmentPlan] = useState(false);
+    const [showSimulator, setShowSimulator] = useState(false);
     const [hoveredTooth, setHoveredTooth] = useState<number | string | null>(null);
     const [selectedTooth, setSelectedTooth] = useState<number | string | null>(null);
     const [aiDetailTooth, setAiDetailTooth] = useState<number | string | null>(null);
@@ -420,6 +427,14 @@ export const ToothPainLocator = () => {
 
         return () => timeouts.forEach(clearTimeout);
     }, [aiPayload, chartType]);
+
+    const handleSaveVoiceNote = (note: string) => {
+        // Append voice note to current notes if a tooth is selected, or just log it
+        if (selectedTooth) {
+            setNotes(prev => prev ? `${prev}\n[Voice]: ${note}` : `[Voice]: ${note}`);
+        }
+        showToast('Voice note synced to clinical record');
+    };
 
     const handleSave = () => {
         if (!selectedTooth) return;
@@ -501,6 +516,13 @@ export const ToothPainLocator = () => {
             deduped.set(key, det);
         }
     }
+    
+    const issuesFor3D = useMemo(() => {
+        return (aiPayload?.findings || []).map(det => ({
+            toothId: det.tooth_number,
+            condition: det.class
+        }));
+    }, [aiPayload]);
 
     const aiEntries = Array.from(deduped.values()).map(det => {
         const entryId = `ai-${det.tooth_number}-${det.class}`;
@@ -622,7 +644,15 @@ export const ToothPainLocator = () => {
                             <span className="text-[9px] font-bold text-danger uppercase tracking-wide">Urgent</span>
                             <span className="text-sm font-black text-danger">{urgentCount}</span>
                         </div>
+                        <div className="flex-1" />
+                        <button 
+                            onClick={() => setShowTreatmentPlan(true)}
+                            className="px-4 py-1.5 bg-[#238636] hover:bg-[#2ea043] text-white rounded-lg text-xs font-black uppercase tracking-widest transition-all shadow-[0_4px_12px_rgba(35,134,54,0.3)] flex items-center gap-2 mr-1 shrink-0"
+                        >
+                            <FileText size={14} /> Generate Treatment Plan
+                        </button>
                     </div>
+
                 ) : null}
 
                 {/* Sub-header Controls */}
@@ -651,8 +681,23 @@ export const ToothPainLocator = () => {
                                 <Brain size={14} /> {showAIVision ? 'Back to Map' : 'AI Vision'}
                             </button>
                         )}
+                        {aiPayload && (
+                            <button 
+                                onClick={() => setShowSimulator(true)} 
+                                className="px-4 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-2 text-text-secondary hover:text-white"
+                            >
+                                <Sparkles size={14} className="text-primary" /> Simulate Result
+                            </button>
+                        )}
                         <button onClick={() => setChartType('adult')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-colors ${chartType === 'adult' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:text-text'}`}>Adult</button>
                         <button onClick={() => setChartType('child')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-colors ${chartType === 'child' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:text-text'}`}>Child</button>
+                        <div className="w-[1px] h-4 bg-border/40 mx-1 self-center" />
+                        <button 
+                            onClick={() => setViewMode(viewMode === '2d' ? '3d' : '2d')} 
+                            className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-2 ${viewMode === '3d' ? 'bg-cyan-500 text-white shadow-[0_0_12px_rgba(6,182,212,0.4)]' : 'text-text-secondary hover:text-text'}`}
+                        >
+                            {viewMode === '2d' ? '3D View' : '2D Map'}
+                        </button>
                     </div>
                 </div>
 
@@ -662,7 +707,11 @@ export const ToothPainLocator = () => {
                     onDrop={handleDrop} onDragOver={handleDrag} onDragEnter={handleDrag} onDragLeave={handleDrag}
                     style={dragActive ? { border: '2px dashed #2F81F7', backgroundColor: 'rgba(47,129,247,0.1)' } : {}}
                 >
-                    {isScanning ? (
+                    {viewMode === '3d' ? (
+                        <div className="w-full h-full p-4">
+                            <Tooth3DModel issues={issuesFor3D} />
+                        </div>
+                    ) : isScanning ? (
                         <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-[#0D1117] rounded-b-2xl">
                             <div className="w-full max-w-sm relative flex items-center justify-center overflow-hidden rounded-xl border border-border shadow-2xl">
                                 <img src={preview!} alt="Scanning" className="w-full h-auto max-h-[300px] object-contain opacity-30 grayscale" />
@@ -1006,6 +1055,21 @@ export const ToothPainLocator = () => {
                     <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#D29922]"></div><span className="text-[11px] font-bold text-text-muted">Implant</span></div>
                     <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#7F1D1D] shadow-[0_0_8px_rgba(127,29,29,0.5)]"></div><span className="text-[11px] font-bold text-text-muted">Periapical Lesion</span></div>
                 </div>
+
+                {showTreatmentPlan && (
+                    <TreatmentPlanView 
+                        detections={aiPayload?.findings || []}
+                        userReports={allEntries}
+                        onClose={() => setShowTreatmentPlan(false)}
+                    />
+                )}
+
+                {showSimulator && aiPayload && (
+                    <BeforeAfterSimulator 
+                        beforeImage={aiPayload.imageUrl}
+                        onClose={() => setShowSimulator(false)}
+                    />
+                )}
             </div>
 
             <div className="flex-none lg:flex-1 w-full lg:max-w-[420px] min-h-[400px] lg:min-h-0 rounded-2xl border border-border p-5 flex flex-col items-stretch bg-[#161B22] overflow-y-auto lg:overflow-hidden pb-32">
@@ -1113,6 +1177,10 @@ export const ToothPainLocator = () => {
                                 </div>
                             ))
                         )}
+                    </div>
+
+                    <div className="mt-4 pt-4 border-t border-border shrink-0">
+                        <VoiceNotes onSave={handleSaveVoiceNote} />
                     </div>
                 </div>
 
